@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pharmacy/widgets/success_dialog.dart';
-import '../widgets/card_box.dart';
+import '../../widgets/card_box.dart';
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});

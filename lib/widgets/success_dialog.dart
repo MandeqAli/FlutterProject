@@ -1,6 +1,7 @@
+
 import 'package:flutter/material.dart';
 
-class SuccessDialog extends StatelessWidget {
+class SuccessDialog extends StatelessWidget{
   const SuccessDialog({super.key});
 
   @override

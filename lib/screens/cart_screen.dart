@@ -36,6 +36,55 @@ class CartScreen extends StatelessWidget {
                   price: 18.99,
                   image: "assets/claritin.jpeg",
                 ),
+
+                CartItem(
+                  name: "Brufen 400mg",
+                  price: 9.50,
+                  image: "assets/brufen.jpeg",
+                ),
+
+                // Allergy & Cold
+
+                // Antibiotics
+                CartItem(
+                  name: "Amoxicillin",
+                  price: 15.00,
+                  image: "assets/amoxicillin.jpeg",
+                ),
+
+                // Vitamins
+                CartItem(
+                  name: "Vitamin C",
+                  price: 6.99,
+                  image: "assets/vitaminc.jpg",
+                ),
+                CartItem(
+                  name: "Multivitamin",
+                  price: 11.49,
+                  image: "assets/multivitamin.jpg",
+                ),
+
+                // Skincare 🧴
+                CartItem(
+                  name: "Nivea Face Cream",
+                  price: 8.99,
+                  image: "assets/nivea.jpg",
+                ),
+                CartItem(
+                  name: "Vaseline Lotion",
+                  price: 5.99,
+                  image: "assets/vaseline.jpg",
+                ),
+                CartItem(
+                  name: "Garnier Face Wash",
+                  price: 10.50,
+                  image: "assets/garnier.jpg",
+                ),
+                CartItem(
+                  name: "Sunscreen SPF 50",
+                  price: 14.99,
+                  image: "assets/sunscreen.jpg",
+                ),
               ],
             ),
           ),
@@ -49,11 +98,7 @@ class CartScreen extends StatelessWidget {
                 top: Radius.circular(24),
               ),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha((0.5 * 255).round()),
-
-                  blurRadius: 10,
-                ),
+                BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), blurRadius: 10),
               ],
             ),
             child: Column(
