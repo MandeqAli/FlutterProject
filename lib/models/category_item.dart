@@ -1,4 +1,3 @@
-// lib/models/category_item.dart
 import 'package:get/get.dart';
 
 class CategoryItem {
@@ -7,9 +6,8 @@ class CategoryItem {
   final String subtitle;
   final String imageUrl;
 
-  // extra details for the details page
   final String description;
-  final int priceCents; // just for demo
+  final int priceCents;
   final double rating;
   final String etaText;
 
@@ -27,8 +25,21 @@ class CategoryItem {
     bool fav = false,
   }) : isFav = fav.obs;
 
-  String get priceText {
-    final v = priceCents / 100.0;
-    return "\$${v.toStringAsFixed(2)}";
+  String get priceText => "\$${(priceCents / 100).toStringAsFixed(2)}";
+
+  factory CategoryItem.fromJson(Map<String, dynamic> json) {
+    return CategoryItem(
+      id: (json["id"] ?? 0) is int ? json["id"] : int.tryParse("${json["id"]}") ?? 0,
+      title: json["title"] ?? "",
+      subtitle: json["subtitle"] ?? "",
+      imageUrl: json["imageUrl"] ?? "",
+      description: json["description"] ?? "",
+      priceCents: (json["priceCents"] ?? 0) is int
+          ? json["priceCents"]
+          : int.tryParse("${json["priceCents"]}") ?? 0,
+      rating: (json["rating"] is num) ? (json["rating"] as num).toDouble() : 0.0,
+      etaText: json["etaText"] ?? "",
+      fav: json["fav"] == true,
+    );
   }
 }

@@ -1,7 +1,9 @@
-// lib/pages/category_details_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../controllers/cart_controller.dart';
 import '../models/category_item.dart';
+import '../screens/cart_screen.dart';
 
 class CategoryDetailsController extends GetxController {
   final RxInt qty = 1.obs;
@@ -17,9 +19,7 @@ class CategoryDetailsController extends GetxController {
     if (qty.value > 1) qty.value--;
   }
 
-  void toggleOption(int i) {
-    options[i].checked.value = !options[i].checked.value;
-  }
+  void toggleOption(int i) => options[i].checked.value = !options[i].checked.value;
 
   int addonsTotalCents() {
     int sum = 0;
@@ -38,11 +38,12 @@ class CategoryDetailsPage extends StatelessWidget {
   final CategoryDetailsController dc =
   Get.put(CategoryDetailsController(), tag: UniqueKey().toString());
 
-  // ✅ BRIGHTER COLORS
+  final CartController cart = Get.find<CartController>();
+
   static const _bg = Color(0xFF033451);
   static const _card = Color(0xFF123247);
   static const _stroke = Color(0xFF24546B);
-  static const _accentOrange = Color(0xFFFF8A2A); // slightly brighter orange
+  static const _accentOrange = Color(0xFFFF8A2A);
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +57,7 @@ class CategoryDetailsPage extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         centerTitle: true,
-        title: const Text(
-          "Item details",
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
+        title: const Text("Item details", style: TextStyle(fontWeight: FontWeight.w600)),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -100,8 +98,7 @@ class CategoryDetailsPage extends StatelessWidget {
                         errorBuilder: (_, __, ___) => Container(
                           color: _card,
                           alignment: Alignment.center,
-                          child: const Icon(Icons.image_not_supported,
-                              color: Colors.white38),
+                          child: const Icon(Icons.image_not_supported, color: Colors.white38),
                         ),
                       ),
                     ),
@@ -109,13 +106,10 @@ class CategoryDetailsPage extends StatelessWidget {
                   const SizedBox(height: 14),
                   Text(
                     item.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 10),
+
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -125,21 +119,14 @@ class CategoryDetailsPage extends StatelessWidget {
                       _InfoChip(icon: Icons.access_time_rounded, text: item.etaText),
                     ],
                   ),
+
                   const SizedBox(height: 14),
-                  const Text(
-                    "Description",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                  ),
+                  const Text("Description", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
-                  Text(
-                    item.description,
-                    style: const TextStyle(color: Colors.white70, height: 1.35),
-                  ),
+                  Text(item.description, style: const TextStyle(color: Colors.white70, height: 1.35)),
+
                   const SizedBox(height: 16),
-                  const Text(
-                    "Additional options",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                  ),
+                  const Text("Additional options", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
 
                   Obx(() {
@@ -159,15 +146,11 @@ class CategoryDetailsPage extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   o.title,
-                                  style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontWeight: FontWeight.w700),
+                                  style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700),
                                 ),
                               ),
-                              Text(
-                                "+ \$${(o.priceCents / 100).toStringAsFixed(2)}",
-                                style: const TextStyle(color: Colors.white70),
-                              ),
+                              Text("+ \$${(o.priceCents / 100).toStringAsFixed(2)}",
+                                  style: const TextStyle(color: Colors.white70)),
                               const SizedBox(width: 10),
                               Obx(() {
                                 return InkWell(
@@ -177,18 +160,14 @@ class CategoryDetailsPage extends StatelessWidget {
                                     width: 26,
                                     height: 26,
                                     decoration: BoxDecoration(
-                                      color: o.checked.value
-                                          ? _accentOrange
-                                          : Colors.transparent,
+                                      color: o.checked.value ? _accentOrange : Colors.transparent,
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(color: _stroke),
                                     ),
                                     child: Icon(
                                       Icons.check,
                                       size: 16,
-                                      color: o.checked.value
-                                          ? Colors.white
-                                          : Colors.transparent,
+                                      color: o.checked.value ? Colors.white : Colors.transparent,
                                     ),
                                   ),
                                 );
@@ -208,10 +187,7 @@ class CategoryDetailsPage extends StatelessWidget {
 
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-        decoration: BoxDecoration(
-          color: _bg,
-          border: Border(top: BorderSide(color: _stroke)),
-        ),
+        decoration: BoxDecoration(color: _bg, border: Border(top: BorderSide(color: _stroke))),
         child: SafeArea(
           top: false,
           child: Row(
@@ -220,23 +196,15 @@ class CategoryDetailsPage extends StatelessWidget {
                 child: Obx(() {
                   final qty = dc.qty.value;
                   final totalCents = (item.priceCents + dc.addonsTotalCents()) * qty;
-
-                  // ✅ FIXED: cents -> dollars
                   final totalText = "\$${(totalCents / 100).toStringAsFixed(2)}";
-
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text("Total price", style: TextStyle(color: Colors.white70)),
                       const SizedBox(height: 6),
-                      Text(
-                        totalText,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900),
-                      ),
+                      Text(totalText,
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
                     ],
                   );
                 }),
@@ -255,47 +223,44 @@ class CategoryDetailsPage extends StatelessWidget {
                       _QtyBtn(icon: Icons.remove, onTap: dc.dec),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          dc.qty.value.toString(),
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w900),
-                        ),
+                        child: Text("${dc.qty.value}",
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
                       ),
                       _QtyBtn(icon: Icons.add, onTap: dc.inc),
                     ],
                   );
                 }),
               ),
+
               const SizedBox(width: 10),
 
               Expanded(
                 child: SizedBox(
                   height: 46,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accentOrange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  child: Obx(() {
+                    final busy = cart.loading.value;
+                    return ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _accentOrange,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    onPressed: () {
-                      Get.snackbar(
-                        "Added",
-                        "${item.title} added to cart",
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: _card,
-                        colorText: Colors.white,
-                        margin: const EdgeInsets.all(12),
-                        borderRadius: 12,
-                      );
-                    },
-                    icon: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
-                    label: const Text(
-                      "Add to cart",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-                    ),
-                  ),
+                      // inside CategoryDetailsPage button onPressed:
+                      onPressed: busy
+                          ? null
+                          : () async {
+                        await cart.addToCart(item.id, dc.qty.value);
+                        await cart.fetchCart();
+                        Get.off(() => const CartScreen()); // ✅ go to cart
+                      },
+
+                      icon: busy
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                      label: Text(busy ? "Adding..." : "Add to cart",
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                    );
+                  }),
                 ),
               ),
             ],
@@ -308,7 +273,6 @@ class CategoryDetailsPage extends StatelessWidget {
 
 class _InfoChip extends StatelessWidget {
   const _InfoChip({required this.icon, required this.text});
-
   final IconData icon;
   final String text;
 
@@ -319,19 +283,13 @@ class _InfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: _card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _stroke),
-      ),
+      decoration: BoxDecoration(color: _card, borderRadius: BorderRadius.circular(14), border: Border.all(color: _stroke)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 18, color: Colors.white70),
           const SizedBox(width: 8),
-          Text(text,
-              style: const TextStyle(
-                  color: Colors.white70, fontWeight: FontWeight.w800)),
+          Text(text, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w800)),
         ],
       ),
     );
@@ -340,7 +298,6 @@ class _InfoChip extends StatelessWidget {
 
 class _QtyBtn extends StatelessWidget {
   const _QtyBtn({required this.icon, required this.onTap});
-
   final IconData icon;
   final VoidCallback onTap;
 
@@ -354,10 +311,7 @@ class _QtyBtn extends StatelessWidget {
       child: Container(
         width: 30,
         height: 30,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _stroke),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: _stroke)),
         child: Icon(icon, size: 18, color: Colors.white),
       ),
     );
@@ -369,9 +323,5 @@ class _AddonOption {
   final int priceCents;
   final RxBool checked;
 
-  _AddonOption({
-    required this.title,
-    required this.priceCents,
-    bool checked = false,
-  }) : checked = checked.obs;
+  _AddonOption({required this.title, required this.priceCents, bool checked = false}) : checked = checked.obs;
 }
