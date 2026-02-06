@@ -1,4 +1,8 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'pages/categories_page.dart';
 import 'screens/cart_screen.dart';
 
 void main() {
@@ -10,15 +14,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pharmacy App',
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.greenAccent,
         primaryColor: Colors.orange,
       ),
-      home: const CartScreen(),
+
+      // ✅ start page
+      home: CategoriesPage(),
+
+      // ✅ optional routes (recommended)
+      getPages: [
+        GetPage(name: '/', page: () => CategoriesPage()),
+        GetPage(name: '/cart', page: () => const CartScreen()),
+      ],
     );
   }
 }
