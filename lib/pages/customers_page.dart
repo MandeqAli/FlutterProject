@@ -73,11 +73,6 @@ class CustomersPage extends StatelessWidget {
                 ),
 
                 const Spacer(),
-                // _SideIcon(
-                //   icon: Icons.logout,
-                //   active: false,
-                //   onTap: () => Get.offAllNamed("/login"),
-                // ),
                 const SizedBox(height: 18),
               ],
             ),
@@ -264,29 +259,16 @@ class CustomersPage extends StatelessWidget {
 
                             return OrderRow(
                               order: orderMap,
-
-                              // ✅ Confirm: set status + open details with payload
                               onConfirm: () async {
                                 await c.setStatus(id, "confirm");
                                 Get.toNamed(
                                   "/order_details",
-                                  arguments: {
-                                    "id": orderMap["id"],
-                                    "userName": orderMap["userName"],
-                                    "userEmail": orderMap["userEmail"],
-                                    "userPhone": orderMap["userPhone"],
-                                    "status": "confirm",
-                                    "createdAt": orderMap["createdAt"],
-                                    "lines": orderMap["lines"],
-                                    "totalCents": orderMap["totalCents"],
-                                  },
+                                  arguments: orderMap,
                                 );
                               },
-
-                              // ✅ Pending: do nothing
                               onPending: () {},
 
-                              // ✅ Cancel: dialog + delete
+                              // ✅ FIXED Cancel
                               onCancel: () async {
                                 final ok = await Get.dialog<bool>(
                                   AlertDialog(
@@ -309,9 +291,9 @@ class CustomersPage extends StatelessWidget {
                                 );
 
                                 if (ok == true) {
-                                  await c.deleteOrder(
-                                    id,
-                                  ); // ✅ will remove from UI and call backend
+                                  await c.deleteOrder(id);
+                                  c.orders.removeWhere((o) => o.id == id);
+                                  c.orders.refresh(); // ✅ update UI immediately
                                 }
                               },
                             );
