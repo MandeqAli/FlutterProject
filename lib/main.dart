@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-// PAGES
+import 'controllers/cart_controller.dart';
+import 'pages/categories_page.dart';
+
+// SCREENS
 import 'SCR/splash.dart';
-import 'SCR/medicne.dart';
-import 'SCR/vitamine.dart';
 import 'SCR/login.dart';
 import 'SCR/signup.dart';
+import 'SCR/medicne.dart';
+import 'SCR/vitamine.dart';
 
 void main() {
+  // ✅ Keep CartController always alive
+  Get.put(CartController(), permanent: true);
+
   runApp(const PharmyApp());
 }
 
@@ -16,7 +23,7 @@ class PharmyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Pharmy',
       theme: ThemeData(
@@ -29,17 +36,21 @@ class PharmyApp extends StatelessWidget {
         ),
       ),
 
-      // 🔹 START SCREEN
+      // ✅ Start screen
       home: const SplashPage(),
 
-      // OPTIONAL: Named routes (future use)
-      routes: {
-        '/onboarding1': (_) => const OnboardingOne(),
-        '/onboarding2': (_) => const OnboardingTwo(),
-        
-        '/login': (_) => const LoginPage(),
-        '/signup': (_) => const SignupPage(),
-      },
+      // ✅ Routes (GetX)
+      getPages: [
+        GetPage(name: '/', page: () => const SplashPage()),
+        GetPage(name: '/splash', page: () => const SplashPage()),
+
+        GetPage(name: '/categories', page: () => CategoriesPage()),
+        GetPage(name: '/medicine', page: () => const MedicinePage()),
+        GetPage(name: '/vitamine', page: () => const VitaminePage()),
+
+        GetPage(name: '/login', page: () => const LoginPage()),
+        GetPage(name: '/signup', page: () => const SignupPage()),
+      ],
     );
   }
 }
