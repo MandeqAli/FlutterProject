@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
 import 'login.dart';
+import 'home.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -23,9 +23,12 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _signup() {
-    if (_name.text.trim().isEmpty ||
-        _email.text.trim().isEmpty ||
-        _pass.text.trim().isEmpty) {
+    final name = _name.text.trim();
+    final email = _email.text.trim();
+    final pass = _pass.text.trim();
+
+    // ✅ VALIDATION
+    if (name.isEmpty || email.isEmpty || pass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill in all fields"),
@@ -35,19 +38,19 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    final username = _name.text.trim();
-
+    // ✅ SUCCESS MESSAGE
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Account created successfully 🎉"),
+        content: Text("Account created successfully!"),
         backgroundColor: Colors.green,
       ),
     );
 
+    // ✅ GO DIRECTLY TO HOME WITH USERNAME
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => HomePage(username: username),
+        builder: (_) => HomePage(username: name),
       ),
     );
   }
@@ -90,9 +93,6 @@ class _SignupPageState extends State<SignupPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF7A00),
                 minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
               ),
               onPressed: _signup,
               child: const Text(
@@ -103,6 +103,7 @@ class _SignupPageState extends State<SignupPage> {
 
             const SizedBox(height: 24),
 
+            // 🔥 Social icons (UI only)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -116,6 +117,7 @@ class _SignupPageState extends State<SignupPage> {
 
             const Spacer(),
 
+            // ✅ GO TO LOGIN PAGE
             TextButton(
               onPressed: () {
                 Navigator.pushReplacement(
