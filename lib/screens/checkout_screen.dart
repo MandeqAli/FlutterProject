@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/cart_controller.dart';
+import '../controllers/orders_controller.dart';
 import '../widgets/success_dialog.dart';
 import '../pages/categories_page.dart';
 
@@ -12,17 +13,14 @@ class CheckoutScreen extends StatelessWidget {
     final CartController cart = Get.find<CartController>();
 
     return Scaffold(
-      backgroundColor: Color(0xFF155780),
+      backgroundColor: const Color(0xFF155780),
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Checkout",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -63,24 +61,31 @@ class CheckoutScreen extends StatelessWidget {
                 onPressed: busy
                     ? null
                     : () async {
-                  try {
-                    await cart.checkout();
+                        try {
+                          await cart.checkout();
 
-                    // ✅ Congratulations dialog
-                    await showDialog(
-                      context: context,
-                      builder: (_) => const SuccessDialog(),
-                    );
+                          // ✅ refresh orders list (only if controller exists)
+                          if (Get.isRegistered<OrdersController>()) {
+                            await Get.find<OrdersController>().fetchOrders();
+                          }
 
-                    // ✅ after OK → back to categories
-                    Get.offAll(() => CategoriesPage());
-                  } catch (e) {
-                    Get.snackbar("Error", e.toString(),
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.black87,
-                        colorText: Colors.white);
-                  }
-                },
+                          await showDialog(
+                            context: context,
+                            builder: (_) => const SuccessDialog(),
+                          );
+
+                          // keep your flow
+                          Get.offAll(() => CategoriesPage());
+                        } catch (e) {
+                          Get.snackbar(
+                            "Error",
+                            e.toString(),
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.black87,
+                            colorText: Colors.white,
+                          );
+                        }
+                      },
                 child: Text(busy ? "Processing..." : "Confirm Order"),
               );
             }),

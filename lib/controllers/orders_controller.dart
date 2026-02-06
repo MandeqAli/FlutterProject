@@ -6,82 +6,56 @@ class OrderRowModel {
   final String userName;
   final String userEmail;
   final String userPhone;
-  final String productName;
-  final int qty;
-  final double amount;
   final String status;
+  final String createdAt;
+  final List<Map<String, dynamic>> lines;
+  final int totalCents;
 
   OrderRowModel({
     required this.id,
     required this.userName,
     required this.userEmail,
     required this.userPhone,
-    required this.productName,
-    required this.qty,
-    required this.amount,
     required this.status,
+    required this.createdAt,
+    required this.lines,
+    required this.totalCents,
   });
 
   factory OrderRowModel.fromJson(Map<String, dynamic> j) {
+    final rawLines = (j["lines"] is List) ? (j["lines"] as List) : [];
     return OrderRowModel(
-      id: (j["id"] ?? 0) is int ? j["id"] : int.tryParse("${j["id"]}") ?? 0,
-
-      // ✅ Your backend orders currently do NOT include customer fields.
-      // Keep your fields, but fall back safely:
+      id: (j["id"] is int) ? j["id"] : int.tryParse("${j["id"]}") ?? 0,
       userName: (j["userName"] ?? "Customer").toString(),
       userEmail: (j["userEmail"] ?? "").toString(),
       userPhone: (j["userPhone"] ?? "-").toString(),
-
-      // ✅ Your backend returns lines: [{title, qty, ...}]
-      productName: _pickProductName(j),
-      qty: _pickQty(j),
-
-      // ✅ Your backend returns totalCents
-      amount: _pickAmount(j),
-
-      // ✅ backend may not return status => default pending
       status: (j["status"] ?? "pending").toString(),
+      createdAt: (j["createdAt"] ?? "").toString(),
+      totalCents: (j["totalCents"] is int)
+          ? j["totalCents"]
+          : int.tryParse("${j["totalCents"]}") ?? 0,
+      lines: rawLines
+          .where((e) => e is Map)
+          .map((e) => (e as Map).cast<String, dynamic>())
+          .toList(),
     );
   }
 
-  static String _pickProductName(Map<String, dynamic> j) {
-    final lines = (j["lines"] is List) ? (j["lines"] as List) : [];
-    if (lines.isNotEmpty && lines.first is Map) {
-      final first = (lines.first as Map).cast<String, dynamic>();
-      return (first["title"] ?? "Unknown Product").toString();
-    }
-    return (j["productName"] ?? "Unknown Product").toString();
+  String get productName {
+    if (lines.isNotEmpty) return (lines.first["title"] ?? "Item").toString();
+    return "Item";
   }
 
-  static int _pickQty(Map<String, dynamic> j) {
-    final lines = (j["lines"] is List) ? (j["lines"] as List) : [];
-    if (lines.isNotEmpty && lines.first is Map) {
-      final first = (lines.first as Map).cast<String, dynamic>();
-      final v = first["qty"];
+  int get qty {
+    if (lines.isNotEmpty) {
+      final v = lines.first["qty"];
       if (v is int) return v;
       return int.tryParse("$v") ?? 1;
     }
-    final v = j["qty"];
-    if (v is int) return v;
-    return int.tryParse("$v") ?? 1;
+    return 1;
   }
 
-  static double _pickAmount(Map<String, dynamic> j) {
-    // backend: totalCents
-    final v = j["totalCents"];
-    if (v is num) return (v.toDouble() / 100.0);
-    final parsed = double.tryParse("${v ?? 0}") ?? 0.0;
-    return parsed / 100.0;
-  }
-
-  String get initials {
-    final parts = userName.trim().split(RegExp(r"\s+"));
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    if (parts.isNotEmpty && parts[0].isNotEmpty) {
-      return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
-    }
-    return "UN";
-  }
+  double get amount => totalCents / 100.0;
 }
 
 class OrdersController extends GetxController {
@@ -100,11 +74,16 @@ class OrdersController extends GetxController {
       loading.value = true;
       error.value = "";
 
-      // ✅ CHANGED ONLY THIS LINE: your backend endpoint
+      // ✅ Your backend list: GET /api/orders -> {success, data:[...]}
       final res = await Api.get("/api/orders");
-
       final list = (res["data"] as List? ?? []);
-      orders.assignAll(list.map((e) => OrderRowModel.fromJson(e)).toList());
+      orders.assignAll(
+        list
+            .map(
+              (e) => OrderRowModel.fromJson((e as Map).cast<String, dynamic>()),
+            )
+            .toList(),
+      );
     } catch (e) {
       error.value = e.toString();
     } finally {
@@ -114,10 +93,8 @@ class OrdersController extends GetxController {
 
   Future<void> setStatus(int orderId, String status) async {
     try {
-      // ❗ your backend doesn't have this endpoint yet
-      // await Api.post("/api/admin/orders/$orderId/status", {"status": status});
+      await Api.post("/api/orders/$orderId/status", {"status": status});
 
-      // ✅ keep your logic: update local so UI changes
       final idx = orders.indexWhere((x) => x.id == orderId);
       if (idx != -1) {
         final old = orders[idx];
@@ -126,10 +103,10 @@ class OrdersController extends GetxController {
           userName: old.userName,
           userEmail: old.userEmail,
           userPhone: old.userPhone,
-          productName: old.productName,
-          qty: old.qty,
-          amount: old.amount,
           status: status,
+          createdAt: old.createdAt,
+          lines: old.lines,
+          totalCents: old.totalCents,
         );
       }
     } catch (e) {
@@ -137,14 +114,23 @@ class OrdersController extends GetxController {
     }
   }
 
+  // ✅ THIS IS THE IMPORTANT PART
   Future<void> deleteOrder(int orderId) async {
-    try {
-      // ❗ your backend doesn't have this endpoint yet
-      // await Api.post("/api/admin/orders/$orderId/delete", {});
+    // optimistic remove (UI updates instantly)
+    final idx = orders.indexWhere((x) => x.id == orderId);
+    if (idx == -1) return;
 
-      orders.removeWhere((x) => x.id == orderId);
+    final removed = orders[idx];
+    orders.removeAt(idx);
+
+    try {
+      await Api.post("/api/orders/$orderId/delete", {});
+      // success -> keep removed
+      Get.snackbar("Deleted", "Order removed successfully");
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      // restore if backend failed
+      orders.insert(idx, removed);
+      Get.snackbar("Delete failed", e.toString());
     }
   }
 }
