@@ -6,7 +6,7 @@ import '../controllers/auth_controller.dart';
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
-  // Get the AuthController
+  // ✅ Get the AuthController
   final AuthController auth = Get.find<AuthController>();
 
   @override
@@ -15,7 +15,8 @@ class HomePage extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 1, 32, 45),
       body: SafeArea(
         child: Obx(() {
-          final username = auth.currentUser.value;
+          // ✅ FIX: use currentUserName (not currentUser)
+          final username = auth.currentUserName.value;
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
@@ -130,7 +131,10 @@ class _SearchBar extends StatelessWidget {
           Icon(Icons.search_rounded, color: Colors.white54),
           SizedBox(width: 10),
           Expanded(
-            child: Text('Search medicines, vitamins, skincare...', style: TextStyle(color: Colors.white54, fontSize: 14)),
+            child: Text(
+              'Search medicines, vitamins, skincare...',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
           ),
           Icon(Icons.tune_rounded, color: Colors.white54),
         ],
@@ -155,7 +159,9 @@ class _HeroCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: const [BoxShadow(blurRadius: 22, color: Color(0x33000000), offset: Offset(0, 12))],
+        boxShadow: const [
+          BoxShadow(blurRadius: 22, color: Color(0x33000000), offset: Offset(0, 12))
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -167,9 +173,15 @@ class _HeroCard extends StatelessWidget {
                 children: [
                   const Text('Pharmy Care', style: TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 6),
-                  const Text('Health products\nfor your lifestyle', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1.1)),
+                  const Text(
+                    'Health products\nfor your lifestyle',
+                    style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w900, height: 1.1),
+                  ),
                   const SizedBox(height: 10),
-                  Text('Personal picks for ${username.isEmpty ? "you" : username}', style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Text(
+                    'Personal picks for ${username.isEmpty ? "you" : username}',
+                    style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
                   const Spacer(),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -253,13 +265,29 @@ class _CategoriesRow extends StatelessWidget {
           return Container(
             width: 92,
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)),
+            decoration: BoxDecoration(
+              color: Colors.white10,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white12),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(width: 40, height: 40, decoration: BoxDecoration(color: const Color(0x22FF7A00), borderRadius: BorderRadius.circular(14)), child: Image.network(imageUrl, fit: BoxFit.cover)),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0x22FF7A00),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Image.network(imageUrl, fit: BoxFit.cover),
+                ),
                 const SizedBox(height: 8),
-                Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                Text(
+                  text,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           );
@@ -286,7 +314,12 @@ class _OffersGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: products.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.95),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.95,
+      ),
       itemBuilder: (context, i) {
         final name = products[i].$1;
         final price = products[i].$2;
@@ -294,13 +327,20 @@ class _OffersGrid extends StatelessWidget {
 
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)),
+          decoration: BoxDecoration(
+            color: Colors.white10,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white12),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Center(
-                  child: ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(imageUrl, fit: BoxFit.cover)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(imageUrl, fit: BoxFit.cover),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -339,12 +379,26 @@ class _SeasonalRow extends StatelessWidget {
           return Container(
             width: 150,
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white12)),
+            decoration: BoxDecoration(
+              color: Colors.white10,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white12),
+            ),
             child: Row(
               children: [
-                Container(width: 44, height: 44, decoration: BoxDecoration(color: const Color(0x22FF7A00), borderRadius: BorderRadius.circular(14)), child: Image.network(imageUrl, fit: BoxFit.cover)),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0x22FF7A00),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Image.network(imageUrl, fit: BoxFit.cover),
+                ),
                 const SizedBox(width: 10),
-                Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800))),
+                Expanded(
+                  child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                ),
               ],
             ),
           );
