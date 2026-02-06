@@ -2,24 +2,35 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Api {
-  // ✅ Android Emulator uses 10.0.2.2
-  static const baseUrl = 'http://localhost:5000/api';
+  // ✅ Your backend
+  static const String baseUrl = "http://localhost:5000";
 
-  static Future<dynamic> get(String path) async {
-    final res = await http.get(Uri.parse("$baseUrl$path"));
-    if (res.statusCode >= 200 && res.statusCode < 300)
-      return jsonDecode(res.body);
-    throw Exception("GET $path failed: ${res.body}");
+  static Future<Map<String, dynamic>> get(String path) async {
+    final uri = Uri.parse("$baseUrl$path");
+    final res = await http.get(uri);
+
+    final body = res.body.isNotEmpty ? jsonDecode(res.body) : {};
+    if (res.statusCode >= 400) {
+      throw Exception(body["message"] ?? "Request failed (${res.statusCode})");
+    }
+    return (body is Map<String, dynamic>) ? body : {};
   }
 
-  static Future<dynamic> post(String path, dynamic body) async {
+  static Future<Map<String, dynamic>> post(
+    String path,
+    Map<String, dynamic> data,
+  ) async {
+    final uri = Uri.parse("$baseUrl$path");
     final res = await http.post(
-      Uri.parse("$baseUrl$path"),
+      uri,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode(body),
+      body: jsonEncode(data),
     );
-    if (res.statusCode >= 200 && res.statusCode < 300)
-      return jsonDecode(res.body);
-    throw Exception("POST $path failed: ${res.body}");
+
+    final body = res.body.isNotEmpty ? jsonDecode(res.body) : {};
+    if (res.statusCode >= 400) {
+      throw Exception(body["message"] ?? "Request failed (${res.statusCode})");
+    }
+    return (body is Map<String, dynamic>) ? body : {};
   }
 }

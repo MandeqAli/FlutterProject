@@ -66,15 +66,15 @@ class DashboardPage extends StatelessWidget {
                   onTap: () => Get.toNamed("/customers"),
                 ),
                 // ✅ REMOVED /products icon
-                _SideIcon(
-                  icon: Icons.category_outlined,
-                  active: false,
-                  onTap: () => Get.toNamed("/categories"),
-                ),
+                // _SideIcon(
+                //   icon: Icons.category_outlined,
+                //   active: false,
+                //   onTap: () => Get.toNamed("/categories"),
+                // ),
                 const SizedBox(height: 12),
 
                 _SideIcon(
-                  icon: Icons.verified_outlined,
+                  icon: Icons.category_outlined,
                   active: false,
                   onTap: () => Get.toNamed("/order_details"),
                 ),
@@ -88,12 +88,11 @@ class DashboardPage extends StatelessWidget {
                 const Spacer(),
 
                 // ✅ KEEP ONLY ONE logout (removed duplicates)
-                _SideIcon(
-                  icon: Icons.logout,
-                  active: false,
-                  onTap: () => Get.offAllNamed("/login"),
-                ),
-
+                // _SideIcon(
+                //   icon: Icons.logout,
+                //   active: false,
+                //   onTap: () => Get.offAllNamed("/login"),
+                // ),
                 const SizedBox(height: 18),
               ],
             ),

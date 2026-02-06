@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/orders_controller.dart';
-import '../widgets/order_row.dart';
 import '../controllers/theme_controller.dart';
+import '../widgets/order_row.dart';
 
 class CustomersPage extends StatelessWidget {
   CustomersPage({super.key});
@@ -40,7 +40,6 @@ class CustomersPage extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 18),
-                // Logo
                 InkWell(
                   onTap: () => Get.offAllNamed("/dashboard"),
                   borderRadius: BorderRadius.circular(18),
@@ -63,16 +62,10 @@ class CustomersPage extends StatelessWidget {
                 ),
                 _SideIcon(
                   icon: Icons.receipt_long,
-                  active: true, // ✅ Customers page active
+                  active: true,
                   onTap: () => Get.toNamed("/customers"),
                 ),
-                _SideIcon(
-                  icon: Icons.category_outlined,
-                  active: false,
-                  onTap: () => Get.toNamed("/categories"),
-                ),
                 const SizedBox(height: 12),
-
                 _SideIcon(
                   icon: Icons.verified_outlined,
                   active: false,
@@ -80,13 +73,11 @@ class CustomersPage extends StatelessWidget {
                 ),
 
                 const Spacer(),
-
-                // Logout
-                _SideIcon(
-                  icon: Icons.logout,
-                  active: false,
-                  onTap: () => Get.offAllNamed("/login"),
-                ),
+                // _SideIcon(
+                //   icon: Icons.logout,
+                //   active: false,
+                //   onTap: () => Get.offAllNamed("/login"),
+                // ),
                 const SizedBox(height: 18),
               ],
             ),
@@ -133,7 +124,6 @@ class CustomersPage extends StatelessWidget {
 
                         const SizedBox(width: 14),
 
-                        // Dark mode toggle
                         Obx(() {
                           final on = themeC.isDark.value;
                           return InkWell(
@@ -169,7 +159,6 @@ class CustomersPage extends StatelessWidget {
 
                         const SizedBox(width: 10),
 
-                        // Logout button (top)
                         InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () => Get.offAllNamed("/login"),
@@ -203,7 +192,6 @@ class CustomersPage extends StatelessWidget {
 
                     const SizedBox(height: 18),
 
-                    // Page title
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -217,18 +205,15 @@ class CustomersPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
 
-                    // Header row
                     _HeaderRow(border: border, card: card, textColor: text),
-
                     const SizedBox(height: 10),
 
                     Expanded(
                       child: Obx(() {
-                        if (c.loading.value) {
+                        if (c.loading.value)
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
-                        }
 
                         if (c.error.value.isNotEmpty) {
                           return Center(
@@ -265,25 +250,43 @@ class CustomersPage extends StatelessWidget {
                           itemBuilder: (_, i) {
                             final o = c.orders[i];
                             final int id = o.id;
-                            final Map<String, dynamic> map = {
+
+                            final Map<String, dynamic> orderMap = {
                               "id": o.id,
                               "userName": o.userName,
                               "userEmail": o.userEmail,
                               "userPhone": o.userPhone,
-                              "productName": o.productName,
-                              "qty": o.qty,
-                              "amount": o.amount,
                               "status": o.status,
-                              "initials": o.initials,
+                              "createdAt": o.createdAt,
+                              "lines": o.lines,
+                              "totalCents": o.totalCents,
                             };
 
                             return OrderRow(
-                              order: map,
+                              order: orderMap,
+
+                              // ✅ Confirm: set status + open details with payload
                               onConfirm: () async {
                                 await c.setStatus(id, "confirm");
-                                Get.toNamed("/order_details");
+                                Get.toNamed(
+                                  "/order_details",
+                                  arguments: {
+                                    "id": orderMap["id"],
+                                    "userName": orderMap["userName"],
+                                    "userEmail": orderMap["userEmail"],
+                                    "userPhone": orderMap["userPhone"],
+                                    "status": "confirm",
+                                    "createdAt": orderMap["createdAt"],
+                                    "lines": orderMap["lines"],
+                                    "totalCents": orderMap["totalCents"],
+                                  },
+                                );
                               },
-                              onPending: () => c.setStatus(id, "pending"),
+
+                              // ✅ Pending: do nothing
+                              onPending: () {},
+
+                              // ✅ Cancel: dialog + delete
                               onCancel: () async {
                                 final ok = await Get.dialog<bool>(
                                   AlertDialog(
@@ -306,7 +309,9 @@ class CustomersPage extends StatelessWidget {
                                 );
 
                                 if (ok == true) {
-                                  await c.deleteOrder(id);
+                                  await c.deleteOrder(
+                                    id,
+                                  ); // ✅ will remove from UI and call backend
                                 }
                               },
                             );
@@ -331,7 +336,6 @@ class _HeaderRow extends StatelessWidget {
     required this.card,
     required this.textColor,
   });
-
   final Color border;
   final Color card;
   final Color textColor;
@@ -383,7 +387,6 @@ class _SideIcon extends StatelessWidget {
     required this.active,
     required this.onTap,
   });
-
   final IconData icon;
   final bool active;
   final VoidCallback onTap;
