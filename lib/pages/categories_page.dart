@@ -108,30 +108,7 @@ class CategoriesPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Obx(() {
-        final idx = c.selectedTab.value;
-        return Container(
-          padding: const EdgeInsets.only(top: 8, bottom: 10),
-          decoration: BoxDecoration(color: _bg, border: Border(top: BorderSide(color: _stroke))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(icon: Icons.home_outlined, label: "Home", active: idx == 0, onTap: () => c.onTabChange(0)),
-              _NavItem(icon: Icons.grid_view_rounded, label: "Categories", active: idx == 1, onTap: () => c.onTabChange(1)),
-              _NavItem(
-                icon: Icons.shopping_cart_outlined,
-                label: "My Cart",
-                active: idx == 2,
-                onTap: () {
-                  c.onTabChange(2);
-                  Get.to(() => const CartScreen());
-                },
-              ),
-              _NavItem(icon: Icons.person_outline_rounded, label: "Profile", active: idx == 3, onTap: () => c.onTabChange(3)),
-            ],
-          ),
-        );
-      }),
+     
     );
   }
 }
