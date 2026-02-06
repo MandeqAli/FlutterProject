@@ -71,7 +71,7 @@ class CartItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
+                    color: Color(0xFF3AA3FF),
                   ),
                 ),
               ],
@@ -81,7 +81,7 @@ class CartItem extends StatelessWidget {
           // Add Button
           Container(
             decoration: BoxDecoration(
-              color: Colors.green,
+              color: Color(0xFF3AA3FF),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
