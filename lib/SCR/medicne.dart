@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'medicne.dart';
-import 'login.dart';
-
+import 'vitamine.dart';
 class OnboardingOne extends StatelessWidget {
   const OnboardingOne({super.key});
 
@@ -58,7 +57,7 @@ class OnboardingOne extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                      MaterialPageRoute(builder: (_) => const OnboardingTwo()),
                     );
                   },
                   child: const Text('Skip', style: TextStyle(color: Colors.white70)),
@@ -70,7 +69,7 @@ class OnboardingOne extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                      MaterialPageRoute(builder: (_) => const OnboardingTwo()),
                     );
                   },
                   child: const Text('Next'),

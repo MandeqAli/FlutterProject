@@ -1,8 +1,56 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
 import 'login.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _pass = TextEditingController();
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _pass.dispose();
+    super.dispose();
+  }
+
+  void _signup() {
+    if (_name.text.trim().isEmpty ||
+        _email.text.trim().isEmpty ||
+        _pass.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in all fields"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final username = _name.text.trim();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Account created successfully 🎉"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomePage(username: username),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +78,11 @@ class SignupPage extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            _inputField('Full name'),
+            _inputField('Full name', controller: _name),
             const SizedBox(height: 16),
-            _inputField('Email address'),
+            _inputField('Email address', controller: _email),
             const SizedBox(height: 16),
-            _inputField('Password', isPassword: true),
+            _inputField('Password', controller: _pass, isPassword: true),
 
             const SizedBox(height: 28),
 
@@ -42,34 +90,27 @@ class SignupPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF7A00),
                 minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              onPressed: () {},
-              child: const Text('Create account'),
+              onPressed: _signup,
+              child: const Text(
+                'Create account',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
 
             const SizedBox(height: 24),
 
-            // 🔥 Social icon buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _socialIcon(
-                  icon: Icons.g_mobiledata,
-                  color: Colors.white,
-                  bg: Colors.white24,
-                ),
+                _socialIcon(Icons.g_mobiledata, Colors.white24),
                 const SizedBox(width: 20),
-                _socialIcon(
-                  icon: Icons.apple,
-                  color: Colors.white,
-                  bg: Colors.black,
-                ),
+                _socialIcon(Icons.apple, Colors.black),
                 const SizedBox(width: 20),
-                _socialIcon(
-                  icon: Icons.facebook,
-                  color: Colors.white,
-                  bg: Color(0xFF1877F2),
-                ),
+                _socialIcon(Icons.facebook, const Color(0xFF1877F2)),
               ],
             ),
 
@@ -93,8 +134,13 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _inputField(String hint, {bool isPassword = false}) {
+  Widget _inputField(
+    String hint, {
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
     return TextField(
+      controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -110,15 +156,11 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _socialIcon({
-    required IconData icon,
-    required Color color,
-    required Color bg,
-  }) {
+  Widget _socialIcon(IconData icon, Color bg) {
     return CircleAvatar(
       radius: 26,
       backgroundColor: bg,
-      child: Icon(icon, color: color, size: 28),
+      child: Icon(icon, color: Colors.white, size: 28),
     );
   }
 }

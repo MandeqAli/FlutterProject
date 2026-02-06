@@ -26,6 +26,36 @@ class _LoginPageState extends State<LoginPage> {
     return e.split('@').first;
   }
 
+  void _login() {
+    // 🔴 VALIDATION
+    if (_email.text.trim().isEmpty || _pass.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter email and password"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // ✅ LOGIN SUCCESS (TEMP)
+    final username = _usernameFromEmail(_email.text);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Welcome $username"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomePage(username: username),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +72,11 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 120),
             const Text(
               'Welcome Back',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 32),
 
@@ -53,16 +87,10 @@ class _LoginPageState extends State<LoginPage> {
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF7A00),
+                backgroundColor: const Color.fromARGB(255, 227, 200, 175),
                 minimumSize: const Size(double.infinity, 48),
               ),
-              onPressed: () {
-                final username = _usernameFromEmail(_email.text);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => HomePage(username: username)),
-                );
-              },
+              onPressed: _login,
               child: const Text('Sign in'),
             ),
 
@@ -86,8 +114,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _inputField(String hint,
-      {required TextEditingController controller, bool isPassword = false}) {
+  Widget _inputField(
+    String hint, {
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,

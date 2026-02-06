@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pharmacy/SCR/medicne.dart';
 import 'vitamine.dart';
 
 class SplashPage extends StatefulWidget {
@@ -41,7 +42,7 @@ class _SplashPageState extends State<SplashPage> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (_) => const OnboardingTwo()),
+                  MaterialPageRoute(builder: (_) => const OnboardingOne()),
                 );
               },
               child: const Text(
