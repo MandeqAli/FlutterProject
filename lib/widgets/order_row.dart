@@ -10,9 +10,9 @@ class OrderRow extends StatefulWidget {
   });
 
   final Map<String, dynamic> order;
-  final VoidCallback onConfirm;
-  final VoidCallback onPending;
-  final VoidCallback onCancel;
+  final Future<void> Function() onConfirm;
+  final Future<void> Function() onPending;
+  final Future<void> Function() onCancel;
 
   @override
   State<OrderRow> createState() => _OrderRowState();
@@ -41,8 +41,9 @@ class _OrderRowState extends State<OrderRow> {
         .where((e) => e.isNotEmpty)
         .toList();
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    if (parts.isNotEmpty && parts[0].length >= 2)
+    if (parts.isNotEmpty && parts[0].length >= 2) {
       return parts[0].substring(0, 2).toUpperCase();
+    }
     if (parts.isNotEmpty) return parts[0][0].toUpperCase();
     return "CU";
   }
@@ -73,10 +74,11 @@ class _OrderRowState extends State<OrderRow> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
+        /// Overlay to close menu when clicking outside
         if (open)
           Positioned.fill(
             child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
+              behavior: HitTestBehavior.deferToChild,
               onTap: () => setState(() => open = false),
               child: const SizedBox.expand(),
             ),
@@ -206,10 +208,7 @@ class _OrderRowState extends State<OrderRow> {
                       icon: Icons.check,
                       title: "Confirm",
                       subtitle: "Open order details",
-                      onTap: () {
-                        setState(() => open = false);
-                        widget.onConfirm();
-                      },
+                      onTap: widget.onConfirm,
                     ),
                     const Divider(height: 1),
                     _ActionItem(
@@ -218,10 +217,7 @@ class _OrderRowState extends State<OrderRow> {
                       icon: Icons.hourglass_bottom,
                       title: "Pending",
                       subtitle: "Do nothing",
-                      onTap: () {
-                        setState(() => open = false);
-                        widget.onPending();
-                      },
+                      onTap: widget.onPending,
                     ),
                     const Divider(height: 1),
                     _ActionItem(
@@ -230,10 +226,7 @@ class _OrderRowState extends State<OrderRow> {
                       icon: Icons.close,
                       title: "Cancel",
                       subtitle: "Delete & remove order",
-                      onTap: () {
-                        setState(() => open = false);
-                        widget.onCancel();
-                      },
+                      onTap: widget.onCancel,
                     ),
                   ],
                 ),
@@ -260,43 +253,50 @@ class _ActionItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(14),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click, // hand cursor
+      child: InkWell(
+        onTap: () async => await onTap(),
+        hoverColor: const Color(0xFFF1F5F9),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: iconColor),
               ),
-              child: Icon(icon, color: iconColor),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
