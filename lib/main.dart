@@ -19,6 +19,16 @@ import 'pages/customers_page.dart';
 // import 'pages/order_details_page.dart';
 // Added this since you reference it
 
+// import 'pages/order_details_page.dart';
+// Added this since you reference it
+
+import 'pages/profile.dart';
+// import other pages you already have:
+// import 'pages/categories_page.dart';
+// import 'pages/confirmed_orders_page.dart';
+// import 'pages/messages_page.dart';
+// import 'pages/login_page.dart';
+
 void main() {
   // Initialize controllers globally
   Get.put(CartController(), permanent: true);
@@ -58,6 +68,16 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
         // GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
         GetPage(name: '/confirmed_orders', page: () => OrderDetailsPage()),
+        GetPage(name: "/dashboard", page: () => DashboardPage()),
+        GetPage(name: "/customers", page: () => CustomersPage()),
+
+        GetPage(name: "/profile", page: () => const ProfileScreen()),
+
+        // Add your real pages here:
+        // GetPage(name: "/categories", page: () => CategoriesPage()),
+        // GetPage(name: "/order_details", page: () => ConfirmedOrdersPage()),
+        // GetPage(name: "/messages", page: () => MessagesPage()),
+        // GetPage(name: "/login", page: () => LoginPage()),
       ],
     );
   }
