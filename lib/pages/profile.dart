@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/profileUserModel.dart';
-import '../service/profile_servicesAPI.dart';
+import '../services/profile_ServicesAPI.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String userId;
-  const ProfileScreen({super.key, required this.userId});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -14,107 +13,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
   User? user;
   bool loading = true;
 
-  int _currentIndex = 3; // Profile tab selected by default
-
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    fetchUser();
+    loadProfile();
   }
 
-  void fetchUser() async {
-    user = await ApiService.getUser(widget.userId);
-    if (user != null) {
-      _nameController.text = user!.name;
-      _emailController.text = user!.email;
-      _phoneController.text = user!.phone ?? '';
-    }
-    setState(() {
-      loading = false;
-    });
-  }
-
-  void updateUser() async {
-    if (user != null) {
-      final updatedUser = User(
-        id: user!.id,
-        name: _nameController.text,
-        email: _emailController.text,
-        phone: _phoneController.text,
-      );
-      final result = await ApiService.updateUser(updatedUser);
-      if (result != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile Updated!')),
-        );
-      }
-    }
-  }
-
-  // Navigation handler
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-
-    if (index == 0) {
-      Navigator.pushNamed(context, '/home');
-    } else if (index == 1) {
-      Navigator.pushNamed(context, '/categories');
-    } else if (index == 2) {
-      Navigator.pushNamed(context, '/products');
-    } else if (index == 3) {
-      // Already on profile
-    }
+  void loadProfile() async {
+    user = await ApiService.getProfile();
+    setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: const Color(0xFFF5F6F8),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
+          : SafeArea(
               child: Column(
                 children: [
-                  TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Name')),
-                  TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(labelText: 'Email')),
-                  TextField(
-                      controller: _phoneController,
-                      decoration: const InputDecoration(labelText: 'Phone')),
+                  const SizedBox(height: 10),
+                  const Text("My Profile",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: updateUser, child: const Text('Update'))
+
+                  // Profile Card
+                  Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Column(
+                      children: [
+                        const CircleAvatar(
+                          radius: 40,
+                          backgroundImage:
+                              AssetImage("assets/logo.jpg"),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(user!.name,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(user!.email,
+                            style: const TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+
+                  // Points
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.diamond, color: Colors.teal),
+                        ),
+                        const SizedBox(width: 12),
+                        Text("${user!.points} Points",
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const ListTile(title: Text("Personal Details")),
+                  const ListTile(title: Text("Saved Identification")),
+                  const ListTile(title: Text("Family Members")),
+                  const ListTile(title: Text("Account Credit")),
                 ],
               ),
             ),
-
-      // ✅ Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.category), label: 'Categories'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart), label: 'Products'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
     );
   }
 }
