@@ -9,7 +9,14 @@ class CartController extends GetxController {
   final RxList<CartItemModel> items = <CartItemModel>[].obs;
   final RxInt subtotalCents = 0.obs;
 
-  String get subtotalText => "\$${(subtotalCents.value / 100).toStringAsFixed(2)}";
+  String get subtotalText =>
+      "\$${(subtotalCents.value / 100).toStringAsFixed(2)}";
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCart();
+  }
 
   Future<void> fetchCart() async {
     try {
@@ -17,11 +24,17 @@ class CartController extends GetxController {
       error.value = "";
 
       final res = await Api.get("/api/cart");
-      final data = res["data"] ?? {};
+
+      // ✅ handle both: {success:true,data:{...}} OR direct data
+      final data = res["data"] ?? res ?? {};
       final list = (data["items"] as List? ?? []);
 
-      items.assignAll(list.map((e) => CartItemModel.fromJson(e)).toList());
-      subtotalCents.value = (data["subtotalCents"] ?? 0) is int ? data["subtotalCents"] : 0;
+      items.assignAll(
+        list.map((e) => CartItemModel.fromJson((e as Map).cast<String, dynamic>())).toList(),
+      );
+
+      final sc = data["subtotalCents"];
+      subtotalCents.value = sc is int ? sc : int.tryParse("$sc") ?? 0;
     } catch (e) {
       error.value = e.toString();
     } finally {
@@ -34,12 +47,20 @@ class CartController extends GetxController {
       loading.value = true;
       error.value = "";
 
-      final res = await Api.post("/api/cart/add", {"productId": productId, "qty": qty});
-      final data = res["data"] ?? {};
+      final res = await Api.post("/api/cart/add", {
+        "productId": productId,
+        "qty": qty,
+      });
+
+      final data = res["data"] ?? res ?? {};
       final list = (data["items"] as List? ?? []);
 
-      items.assignAll(list.map((e) => CartItemModel.fromJson(e)).toList());
-      subtotalCents.value = (data["subtotalCents"] ?? 0) is int ? data["subtotalCents"] : 0;
+      items.assignAll(
+        list.map((e) => CartItemModel.fromJson((e as Map).cast<String, dynamic>())).toList(),
+      );
+
+      final sc = data["subtotalCents"];
+      subtotalCents.value = sc is int ? sc : int.tryParse("$sc") ?? 0;
     } catch (e) {
       error.value = e.toString();
       rethrow;
@@ -53,12 +74,20 @@ class CartController extends GetxController {
       loading.value = true;
       error.value = "";
 
-      final res = await Api.post("/api/cart/update", {"productId": productId, "qty": qty});
-      final data = res["data"] ?? {};
+      final res = await Api.post("/api/cart/update", {
+        "productId": productId,
+        "qty": qty,
+      });
+
+      final data = res["data"] ?? res ?? {};
       final list = (data["items"] as List? ?? []);
 
-      items.assignAll(list.map((e) => CartItemModel.fromJson(e)).toList());
-      subtotalCents.value = (data["subtotalCents"] ?? 0) is int ? data["subtotalCents"] : 0;
+      items.assignAll(
+        list.map((e) => CartItemModel.fromJson((e as Map).cast<String, dynamic>())).toList(),
+      );
+
+      final sc = data["subtotalCents"];
+      subtotalCents.value = sc is int ? sc : int.tryParse("$sc") ?? 0;
     } catch (e) {
       error.value = e.toString();
     } finally {
@@ -71,6 +100,7 @@ class CartController extends GetxController {
       loading.value = true;
       error.value = "";
       await Api.post("/api/cart/clear", {});
+
       items.clear();
       subtotalCents.value = 0;
     } catch (e) {
@@ -80,15 +110,45 @@ class CartController extends GetxController {
     }
   }
 
-  Future<void> checkout() async {
-    // send items to backend
-    final payload = {
-      "items": items.map((e) => {"productId": e.productId, "qty": e.qty}).toList(),
-      "address": {"name": "John Smith", "city": "Mogadishu"},
-      "paymentMethod": "COD",
-    };
+  Future<void> checkout({
+    required String userName,
+    required String userEmail,
+    required String userPhone,
+  }) async {
+    try {
+      loading.value = true;
+      error.value = "";
 
-    await Api.post("/api/orders/checkout", payload);
-    await clearCart();
+      // ✅ If your model uses different fields, adjust here:
+      final payloadItems = items
+          .map((x) => {
+        "productId": x.productId, // must match your CartItemModel
+        "qty": x.qty,
+      })
+          .toList();
+
+      if (payloadItems.isEmpty) {
+        throw "Cart is empty";
+      }
+
+      final body = {
+        "items": payloadItems,
+        "userName": userName,
+        "userEmail": userEmail,
+        "userPhone": userPhone,
+        "paymentMethod": "COD",
+        "address": {"name": userName, "city": "Mogadishu"},
+      };
+
+      await Api.post("/api/orders/checkout", body);
+
+      // ✅ clear UI cart after successful order
+      await clearCart();
+    } catch (e) {
+      error.value = e.toString();
+      rethrow;
+    } finally {
+      loading.value = false;
+    }
   }
 }

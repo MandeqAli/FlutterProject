@@ -41,7 +41,9 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     // For demo, any non-empty email/password logs in successfully
-    auth.currentUser.value = email; // Save username/email
+    auth.currentUserEmail.value = email;
+    auth.currentUserName.value = email.split("@").first; // fallback until backend login returns name
+
 
     Get.snackbar(
       "Success",
