@@ -16,18 +16,8 @@ import 'screens/vitamine.dart';
 import 'screens/home.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/customers_page.dart';
-// import 'pages/order_details_page.dart';
-// Added this since you reference it
-
-// import 'pages/order_details_page.dart';
-// Added this since you reference it
 
 import 'pages/profile.dart';
-// import other pages you already have:
-// import 'pages/categories_page.dart';
-// import 'pages/confirmed_orders_page.dart';
-// import 'pages/messages_page.dart';
-// import 'pages/login_page.dart';
 
 void main() {
   // Initialize controllers globally
