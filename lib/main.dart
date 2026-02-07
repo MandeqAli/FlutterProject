@@ -16,6 +16,8 @@ import 'screens/vitamine.dart';
 import 'screens/home.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/customers_page.dart';
+// import 'pages/order_details_page.dart';
+// Added this since you reference it
 
 void main() {
   // Initialize controllers globally
@@ -54,6 +56,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/customers', page: () => CustomersPage()),
         GetPage(name: '/categories', page: () => CategoriesPage()),
         GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
+        // GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
         GetPage(name: '/confirmed_orders', page: () => OrderDetailsPage()),
       ],
     );
