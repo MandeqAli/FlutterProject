@@ -16,7 +16,10 @@ import 'screens/vitamine.dart';
 import 'screens/home.dart';
 import 'pages/dashboard_page.dart';
 import 'pages/customers_page.dart';
-// import 'pages/order_details_page.dart'; // Added this since you reference it
+feature/SCRUM-19-admin
+// import 'pages/order_details_page.dart'; 
+  // Added this since you reference it
+ main
 
 void main() {
   // Initialize controllers globally
@@ -40,7 +43,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: ThemeMode.light, // Can later be dynamic via ThemeController
-
       // Start screen
       home: const SplashPage(),
 
@@ -55,7 +57,10 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/dashboard', page: () => DashboardPage()),
         GetPage(name: '/customers', page: () => CustomersPage()),
         GetPage(name: '/categories', page: () => CategoriesPage()),
+ feature/SCRUM-19-admin
+        GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
         // GetPage(name: '/order_details', page: () => const OrderDetailsPage()),
+        main
         GetPage(name: '/confirmed_orders', page: () => OrderDetailsPage()),
       ],
     );
