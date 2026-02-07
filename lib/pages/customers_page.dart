@@ -266,7 +266,7 @@ class CustomersPage extends StatelessWidget {
                                   arguments: orderMap,
                                 );
                               },
-                              onPending: () {},
+                              onPending: () async {},
 
                               // ✅ FIXED Cancel
                               onCancel: () async {
